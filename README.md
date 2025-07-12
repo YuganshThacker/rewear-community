@@ -85,12 +85,14 @@ ReWear lets users:
 ```bash
 # Clone the repo
 git clone https://github.com/your-username/rewear-platform.git
-cd rewear-platform
+cd closet-swap-hub
 
 # Install frontend dependencies
-cd client
 npm install
+npm run dev
 
 # Install backend dependencies
-cd ../server
+cd my-app
+cd backend
 npm install
+npm run dev
