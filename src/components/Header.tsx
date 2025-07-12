@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   User, 
   Heart, 
@@ -13,12 +14,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface HeaderProps {
-  isAuthenticated?: boolean;
-  userPoints?: number;
-}
-
-export const Header = ({ isAuthenticated = false, userPoints = 0 }: HeaderProps) => {
+export const Header = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -67,7 +64,7 @@ export const Header = ({ isAuthenticated = false, userPoints = 0 }: HeaderProps)
                 {/* Points Display */}
                 <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
                   <Coins className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{userPoints}</span>
+                  <span className="font-medium">{user?.points || 0}</span>
                   <span className="text-sm text-muted-foreground">points</span>
                 </div>
 
@@ -141,7 +138,7 @@ export const Header = ({ isAuthenticated = false, userPoints = 0 }: HeaderProps)
               <>
                 <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg w-fit">
                   <Coins className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{userPoints} points</span>
+                  <span className="font-medium">{user?.points || 0} points</span>
                 </div>
                 
                 <div className="flex gap-2">

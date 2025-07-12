@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 import { 
   ShoppingBag, 
   Mail, 
@@ -21,8 +23,11 @@ interface AuthProps {
 }
 
 const Auth = ({ mode = "login" }: AuthProps) => {
+  const navigate = useNavigate();
+  const { login, signup } = useAuth();
   const [isLogin, setIsLogin] = useState(mode === "login");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -225,8 +230,55 @@ const Auth = ({ mode = "login" }: AuthProps) => {
                   )}
 
                   {/* Submit Button */}
-                  <Button variant="hero" className="w-full py-6 text-lg font-semibold">
-                    {isLogin ? "Sign In" : "Create Account"}
+                  <Button 
+                    type="submit"
+                    variant="hero" 
+                    className="w-full py-6 text-lg font-semibold"
+                    disabled={isLoading}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      setIsLoading(true);
+                      
+                      try {
+                        if (isLogin) {
+                          await login(formData.email, formData.password);
+                          toast({
+                            title: "Welcome back!",
+                            description: "Successfully signed in to your account.",
+                          });
+                        } else {
+                          if (formData.password !== formData.confirmPassword) {
+                            toast({
+                              title: "Passwords don't match",
+                              description: "Please make sure your passwords match.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          await signup({
+                            fullName: formData.name,
+                            email: formData.email,
+                            password: formData.password,
+                            username: formData.email.split('@')[0], // Generate username from email
+                          });
+                          toast({
+                            title: "Account created!",
+                            description: "Welcome to ReWear! Your account has been created successfully.",
+                          });
+                        }
+                        navigate('/dashboard');
+                      } catch (error: any) {
+                        toast({
+                          title: "Authentication failed",
+                          description: error.message || "Please check your credentials and try again.",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    {isLoading ? "Loading..." : (isLogin ? "Sign In" : "Create Account")}
                   </Button>
                 </form>
 
